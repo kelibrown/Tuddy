@@ -1,27 +1,22 @@
+# import external classes being used
 
-from dotenv import load_dotenv
-
-from AiTutorEngine import AITutorEngine, study_document
-from ChatSession import ChatSession
-from UserInterface import UserInterface
-
-load_dotenv()
+from dotenv import load_dotenv # file where API key is being securely stored
+from openai import OpenAI
 
 
-def main():
-    chat_session = ChatSession()
+load_dotenv() # load .env file in
 
-    # Pass the existing study document into the AI engine
-    ai_tutor = AITutorEngine(study_document)
+client = OpenAI()
 
-    # Create and launch the interface
-    user_interface = UserInterface(
-        ai_tutor,
-        chat_session
+try:
+    response = client.responses.create(
+        model = "gpt-6-luna",
+        input = "You are Tuddy, an AI tutor, Introduce yourself in one sentence."
     )
 
-    user_interface.launch()
+    print(response.output_text)
 
-
-if __name__ == "__main__":
-    main()
+except Exception as error:
+    print("something went wrong:")
+    print(type(error).__name__)
+    print(error)
