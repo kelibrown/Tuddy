@@ -82,7 +82,7 @@ footer {
 
 
 class UserInterface:
-# constructor needs to recieve the study doc to later be displayed.
+# Constructor needs to receive the study doc to later be displayed.
     def __init__(self, ai_tutor, chat_session):
 
         self.ai_tutor = ai_tutor
@@ -116,7 +116,7 @@ class UserInterface:
 
     # class / presentation demo
     def generate_demo_quiz(self, topic):
-            quiz = self.ai_tutor.generateQuiz(topic)
+            quiz = self.ai_tutor.generate_quiz(topic)
             return quiz.content
 
     def clear_chat(self):

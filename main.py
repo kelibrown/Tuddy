@@ -1,7 +1,7 @@
 
 from dotenv import load_dotenv
 
-from AiTutorEngine import AITutorEngine, studyDocument
+from AiTutorEngine import AITutorEngine, study_document
 from ChatSession import ChatSession
 from UserInterface import UserInterface
 
@@ -12,7 +12,7 @@ def main():
     chat_session = ChatSession()
 
     # Pass the existing study document into the AI engine
-    ai_tutor = AITutorEngine(studyDocument)
+    ai_tutor = AITutorEngine(study_document)
 
     # Create and launch the interface
     user_interface = UserInterface(
