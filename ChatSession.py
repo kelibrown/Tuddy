@@ -1,25 +1,17 @@
 
 class ChatSession:
+    def __init__(self):
+        self.message_log = []
 
-    def __init__(self, session_id, user_id):
-        self.sessionID = session_id
-        self.userID = user_id
-
-        self.startedAt = None
-        self.lastActiveAt = None
-
-        self.messageLog = []
-
-    def appendMessage(self, sender, text):
+    def append_message(self, sender, text):
         message = {
             "role": sender,
             "content": text
         }
+        self.message_log.append(message)
 
-        self.messageLog.append(message)
+    def get_formatted_history(self):
+        return self.message_log
 
-    def getFormattedHistory(self):
-        return self.messageLog
-
-    def clearHistory(self):
-        self.messageLog.clear()
+    def clear_history(self):
+        self.message_log = []
