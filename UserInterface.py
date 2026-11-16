@@ -1,6 +1,8 @@
 # ui css and html, user interface logic
 import base64
 from pathlib import Path
+from AiTutorEngine import Document
+
 
 import gradio as gr
 
@@ -31,7 +33,6 @@ CSS = """
     width: 180px;
     height: 180px;
     object-fit: contain;
-    background: #fffaf4;
     border-radius: 18px;
 }
 
@@ -81,7 +82,7 @@ footer {
 
 
 class UserInterface:
-
+# constructor needs to recieve the study doc to later be displayed.
     def __init__(self, ai_tutor, chat_session):
 
         self.ai_tutor = ai_tutor
@@ -112,14 +113,11 @@ class UserInterface:
         # Return the complete conversation to Gradio
         return self.chat_session.get_formatted_history(), ""
 
-    def request_quiz(self, topic, question_count):
 
-        quiz = self.ai_tutor.generate_quiz(
-            topic,
-            question_count
-        )
-
-        return quiz
+    # class / presentation demo
+    def generate_demo_quiz(self, topic):
+            quiz = self.ai_tutor.generateQuiz(topic)
+            return quiz.content
 
     def clear_chat(self):
 
@@ -130,7 +128,7 @@ class UserInterface:
     def launch(self):
 
         # Load the logo if it exists
-        logo_path = Path(__file__).with_name("tuddy-logo.png")
+        logo_path = Path(__file__).with_name("tuddy-logo-transparent.png")
 
         description = """
         <div class="tuddy-brand">
@@ -232,17 +230,19 @@ class UserInterface:
                 )
 
             # QUIZ TAB
+
+
+            # CLASS DEMO
             with gr.Tab("Generate a Quiz"):
+                gr.Markdown("## Create a Quiz")
+                gr.Markdown(
+                    "Generate a practice quiz using your uploaded study material."
+                )
 
                 topic = gr.Textbox(
                     label="Quiz Topic",
+                    value="Cellular Respiration",
                     placeholder="Enter a topic..."
-                )
-
-                question_count = gr.Number(
-                    label="Number of Questions",
-                    value=5,
-                    precision=0
                 )
 
                 generate_button = gr.Button(
@@ -251,13 +251,14 @@ class UserInterface:
                 )
 
                 quiz_output = gr.Textbox(
-                    label="Generated Quiz",
-                    lines=15
+                    label="Your Generated Quiz",
+                    lines=20,
+                    interactive=False
                 )
 
                 generate_button.click(
-                    fn=self.request_quiz,
-                    inputs=[topic, question_count],
+                    fn=self.generate_demo_quiz,
+                    inputs=topic,
                     outputs=quiz_output
                 )
 
