@@ -1,22 +1,19 @@
-# import external classes being used
-
-from dotenv import load_dotenv # file where API key is being securely stored
+from dotenv import load_dotenv
 from openai import OpenAI
 
-
-load_dotenv() # load .env file in
+load_dotenv()
 
 client = OpenAI()
 
 try:
     response = client.responses.create(
-        model = "gpt-6-luna",
-        input = "You are Tuddy, an AI tutor, Introduce yourself in one sentence."
+        model="gpt-6-luna", #ai model
+        input="You are Tuddy, an AI tutor. Introduce yourself in one sentence."
     )
 
     print(response.output_text)
 
 except Exception as error:
-    print("something went wrong:")
+    print("Something went wrong:")
     print(type(error).__name__)
     print(error)

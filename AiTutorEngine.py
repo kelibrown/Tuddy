@@ -1,14 +1,10 @@
 
-
 import os
 from dataclasses import dataclass
 from dotenv import load_dotenv
 from openai import OpenAI
 
-
 load_dotenv()
-
-
 
 
 # CLASS 3: Document (Entity)
@@ -18,8 +14,6 @@ class Document:
     extractedText: str
 
 
-
-
 # CLASS 7: StudyMaterial (Entity)
 @dataclass
 class StudyMaterial:
@@ -27,21 +21,20 @@ class StudyMaterial:
     content: str
 
 
-
-
 # CLASS 5: AITutorEngine (Control)
 class AITutorEngine:
+
     def __init__(self):
         self._client = OpenAI(
             api_key=os.environ["OPENAI_API_KEY"]
         )
         self._currentModelVersion = "gpt-6-luna"
+
         self._socraticPromptTemplate = (
             "You are Tuddy, an educational AI tutor. "
             "Your purpose is to encourage learning, "
             "critical thinking, and independent reasoning."
         )
-
 
     # Private method: constructs the AI prompt
     def _constructPrompt(self, basePrompt, context, history):
@@ -51,27 +44,22 @@ class AITutorEngine:
             f"ADDITIONAL CONTEXT:\n{history}"
         )
 
-
     # Private method: calls the OpenAI API
     def _executeModelCall(self, payload):
         response = self._client.responses.create(
-            # yield current model version - gpt-6-luna
             model=self._currentModelVersion,
             instructions=self._socraticPromptTemplate,
-            # payload - the actual data being sent
             input=payload
         )
-
 
         if not response.output_text:
             raise ValueError("The AI returned no quiz text.")
 
-
         return response.output_text
-
 
     # Public method: generates a quiz
     def generateQuiz(self, contextDoc, topic):
+
         quizInstructions = (
             f"Generate exactly 5 multiple-choice "
             f"questions about {topic}.\n"
@@ -86,16 +74,13 @@ class AITutorEngine:
             "say so instead of inventing facts."
         )
 
-
         prompt = self._constructPrompt(
             quizInstructions,
             contextDoc.extractedText,
             ""
         )
 
-
         generatedText = self._executeModelCall(prompt)
-
 
         return StudyMaterial(
             materialType="QUIZ",
@@ -103,14 +88,12 @@ class AITutorEngine:
         )
 
 
-
-
 # MAIN PROGRAM - CLASSROOM DEMO
 def main():
-    print("================================")
-    print(" WELCOME TO TUDDY ")
-    print("================================")
 
+    print("================================")
+    print("        WELCOME TO TUDDY        ")
+    print("================================")
 
     # Simulates text extracted from an uploaded file
     studyDocument = Document(
@@ -133,36 +116,27 @@ def main():
         )
     )
 
-
     topic = input(
         "\nWhat topic would you like a quiz on? "
     ).strip()
 
-
     if not topic:
         topic = "Cellular Respiration"
 
-
     print("\nTuddy is generating your quiz...\n")
 
-
     tutor = AITutorEngine()
-
 
     quiz = tutor.generateQuiz(
         studyDocument,
         topic
     )
 
-
     print("================================")
-    print(" GENERATED QUIZ ")
+    print("          GENERATED QUIZ        ")
     print("================================\n")
 
-
     print(quiz.content)
-
-
 
 
 if __name__ == "__main__":
@@ -172,8 +146,3 @@ if __name__ == "__main__":
         print("\nAn error occurred:")
         print(type(error).__name__)
         print(error)
-
-
-
-
-
