@@ -21,7 +21,7 @@ MODEL = "gpt-6-luna"
 
 
 
-# Sample notes for the classroom demonstration
+# sample notes for the classroom demonstration
 STUDY_NOTES = """
 Cellular respiration is the process by which
 cells convert energy from glucose into ATP.
@@ -47,7 +47,7 @@ produce ATP.
 
 
 
-# Your classmate's styling
+# lion's styling
 CSS = """
 .gradio-container {
    width: 100% !important;
@@ -59,6 +59,7 @@ CSS = """
 
 .tuddy-brand {
    margin-bottom: 8px;
+   text-align: left;
 }
 
 
@@ -73,8 +74,9 @@ CSS = """
    width: 180px;
    height: 180px;
    object-fit: contain;
-   background: #fffaf4;
-   border-radius: 18px;
+   background: transparent;
+   border-radius: 0;
+   margin: 0;
 }
 
 
@@ -166,11 +168,13 @@ def parse_answers(message):
 def create_quiz(topic):
    """Ask the AI to return a structured quiz."""
 
+ # quiz instructions/guidelines
 
    prompt = f"""
    Create exactly five multiple-choice questions
    about this topic: {topic}
-
+ 
+    
 
    Use ONLY these study notes:
 
@@ -488,97 +492,86 @@ def tuddy_response(message, history, quiz_state):
 
 
 # Build the visual interface
+
+# Build the visual interface
 def create_interface():
 
+    logo_path = Path(__file__).with_name(
+        "tuddy-logo-transparent.png"
+    )
 
-   logo_path = Path(__file__).with_name(
-       "tuddy-logo.png"
-   )
+    description = """
+    <div class="tuddy-brand">
+        <h1>Tuddy</h1>
+        <p>Your AI study buddy.</p>
+    </div>
+    """
 
+    if logo_path.is_file():
 
-   description = """
-   <div class="tuddy-brand">
-       <h1>Tuddy</h1>
-       <p>Your AI study buddy.</p>
-   </div>
-   """
+        logo_data = base64.b64encode(
+            logo_path.read_bytes()
+        ).decode("ascii")
 
+        description = f"""
+        <div class="tuddy-brand">
+            <img class="tuddy-logo"
+                 src="data:image/png;base64,{logo_data}"
+                 alt="Tuddy bear logo">
+            <p>Your AI study buddy.</p>
+        </div>
+        """
 
-   if logo_path.is_file():
+    with gr.Blocks(
+        theme=gr.themes.Soft(
+            primary_hue="teal",
+            neutral_hue="slate"
+        ),
+        css=CSS
+    ) as demo:
 
+        gr.HTML(description)
 
-       logo_data = base64.b64encode(
-           logo_path.read_bytes()
-       ).decode("ascii")
+        chatbot = gr.Chatbot(
+            label="Conversation",
+            show_label=False,
+            layout="bubble",
+            height=500,
+            elem_id="tuddy-chat",
+            placeholder=(
+                '<div class="tuddy-welcome">'
+                '<strong>What are we studying?</strong>'
+                'Ask a question, work through a problem, '
+                'or review a concept.'
+                '</div>'
+            )
+        )
 
+        textbox = gr.Textbox(
+            placeholder="Ask a study question...",
+            show_label=False,
+            lines=1,
+            max_lines=6,
+            elem_id="tuddy-question"
+        )
 
-       description = f"""
-       <div class="tuddy-brand">
-           <img class="tuddy-logo"
-                src="data:image/png;base64,{logo_data}"
-                alt="Tuddy bear logo">
-           <p>Your AI study buddy.</p>
-       </div>
-       """
+        quiz_state = gr.State(value={})
 
+        gr.ChatInterface(
+            fn=tuddy_response,
+            chatbot=chatbot,
+            textbox=textbox,
+            additional_inputs=[quiz_state],
+            additional_outputs=[quiz_state],
+            run_examples_on_click=False,
+            submit_btn="Send",
+            stop_btn="Stop",
+            fill_height=True,
+            api_name="chat"
+        )
 
-   with gr.Blocks(
-       theme=gr.themes.Soft(
-           primary_hue="teal",
-           neutral_hue="slate"
-       ),
-       css=CSS
-   ) as demo:
+    return demo
 
-
-       gr.HTML(description)
-
-
-       chatbot = gr.Chatbot(
-           label="Conversation",
-           show_label=False,
-           layout="bubble",
-           height=500,
-           elem_id="tuddy-chat",
-           placeholder=(
-               '<div class="tuddy-welcome">'
-               '<strong>What are we studying?</strong>'
-               'Ask a question, work through a problem, '
-               'or review a concept.'
-               '</div>'
-           )
-       )
-
-
-       textbox = gr.Textbox(
-           placeholder="Ask a study question...",
-           show_label=False,
-           lines=1,
-           max_lines=6,
-           elem_id="tuddy-question"
-       )
-
-
-
-
-       quiz_state = gr.State(value={})
-
-
-       gr.ChatInterface(
-       fn=tuddy_response,
-       chatbot=chatbot,
-       textbox=textbox,
-       additional_inputs=[quiz_state],
-       additional_outputs=[quiz_state],
-       run_examples_on_click=False,
-       submit_btn="Send",
-       stop_btn="Stop",
-       fill_height=True,
-       api_name="chat"
-       )
-
-
-   return demo
 
 
 
